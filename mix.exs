@@ -21,8 +21,8 @@ defmodule NxRSBackend.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:nx, "~> 0.7"},
-      {:exla, "~> 0.7"},
+      {:nx, "~> 0.6.4"},
+      {:exla, "~> 0.6.4"},
       {:rustler, "~> 0.31.0"},
       {:benchee, "~> 1.0", only: :dev}
     ]
