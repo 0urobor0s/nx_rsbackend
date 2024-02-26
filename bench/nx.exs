@@ -3,13 +3,15 @@
 Nx.global_default_backend(EXLA.Backend)
 Nx.Defn.global_default_options(compiler: EXLA)
 
-#sizes = [8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096]
+# sizes = [8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096]
 sizes = [128, 256, 512, 1024]
+
 functions = [
   &Nx.LinAlg.qr/1,
   &NxRSBackend.LinAlg.qr_binary/1,
   &NxRSBackend.LinAlg.qr_tensor/1
 ]
+
 chunks = length(functions)
 
 for size <- sizes, function <- functions do
