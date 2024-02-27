@@ -1,7 +1,14 @@
 use faer::{FaerMat, Mat};
+use rustler::types::atom::nil;
 use rustler::{Atom, Binary, Env, NifStruct, NifTuple, OwnedBinary};
 use std::fmt;
 use std::fmt::Debug;
+
+mod nx_atoms {
+    rustler::atoms! {
+        f,
+    }
+}
 
 #[derive(NifTuple)]
 struct QR<'a> {
@@ -140,4 +147,54 @@ fn qr_tensor<'a>(env: Env<'a>, tensor: NxTensor) -> QRTensor<'a> {
     }
 }
 
-rustler::init!("Elixir.NxRSBackend.RS", [qr_binary, qr_tensor]);
+#[rustler::nif]
+fn qr_binary_tensor<'a>(env: Env<'a>, tensor: Binary, nrow: usize, ncol: usize) -> QRTensor<'a> {
+    let mat = binary_to_mat(tensor, nrow, ncol);
+    let mat_qr = mat.qr();
+    let q = mat_qr.compute_thin_q();
+    let r = mat_qr.compute_thin_r();
+
+    let result_q = mat_to_binary(&q);
+    let result_r = mat_to_binary(&r);
+
+    let t_type = NxType {
+        kind: nx_atoms::f(),
+        size: 64,
+    };
+
+    let q_tensor = NxTensor {
+        r#type: t_type,
+        shape: NxShape {
+            row: nrow,
+            col: ncol,
+        },
+        data: NxBinaryBackend {
+            state: Binary::from_owned(result_q, env),
+        },
+        names: vec![nil(), nil()],
+        vectorized_axes: vec![],
+    };
+
+    let r_tensor = NxTensor {
+        r#type: t_type,
+        shape: NxShape {
+            row: ncol,
+            col: ncol,
+        },
+        data: NxBinaryBackend {
+            state: Binary::from_owned(result_r, env),
+        },
+        names: vec![nil(), nil()],
+        vectorized_axes: vec![],
+    };
+
+    QRTensor {
+        q: q_tensor,
+        r: r_tensor,
+    }
+}
+
+rustler::init!(
+    "Elixir.NxRSBackend.RS",
+    [qr_binary, qr_tensor, qr_binary_tensor]
+);

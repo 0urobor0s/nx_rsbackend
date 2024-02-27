@@ -25,7 +25,19 @@ defmodule NxRSBackend.LinAlg do
     tensor
     |> convert_to_binary_backend()
     |> RS.qr_tensor()
-    |> convert_to_given_backend(tensor.data.__struct__)
+
+    # |> convert_to_given_backend(tensor.data.__struct__)
+  end
+
+  def qr_binary_tensor(tensor) do
+    {:f, 64} = Nx.type(tensor)
+    {nrow, ncol} = Nx.shape(tensor)
+
+    tensor
+    |> Nx.to_binary()
+    |> RS.qr_binary_tensor(nrow, ncol)
+
+    # |> convert_to_given_backend(tensor.data.__struct__)
   end
 
   defp convert_to_given_backend(tensors, backend) when is_tuple(tensors) do

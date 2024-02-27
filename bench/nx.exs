@@ -9,7 +9,8 @@ sizes = [128, 256, 512, 1024]
 functions = [
   &Nx.LinAlg.qr/1,
   &NxRSBackend.LinAlg.qr_binary/1,
-  &NxRSBackend.LinAlg.qr_tensor/1
+  &NxRSBackend.LinAlg.qr_tensor/1,
+  &NxRSBackend.LinAlg.qr_binary_tensor/1
 ]
 
 chunks = length(functions)
